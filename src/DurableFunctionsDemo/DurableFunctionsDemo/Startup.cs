@@ -1,4 +1,5 @@
 ﻿using DurableFunctionsDemo.Service.Basic;
+using DurableFunctionsDemo.Service.Unreliable;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,10 @@ namespace DurableFunctionsDemo
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddTransient<IBasicExpenseValidationProvider, BasicExpenseValidationProvider>();
+            builder.Services.AddSingleton<IBasicExpenseValidationProvider, BasicExpenseValidationProvider>();
+
+            builder.Services.AddTransient<IDataService, DataService>();
+            builder.Services.AddTransient<INotificationService, NotificationService>();
         }
     }
 }
