@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using DurableFunctionsDemo.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DurableFunctionsDemo.Service.Unreliable
+namespace DurableFunctionsDemo.Service
 {
     public class DataService : IDataService
     {

@@ -5,8 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DurableFunctionsDemo.Models;
-using DurableFunctionsDemo.Service.Basic;
-using DurableFunctionsDemo.Service.Unreliable;
+using DurableFunctionsDemo.Service;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -15,14 +14,14 @@ namespace DurableFunctionsDemo
 {
     public class AdvancedExpenseReportHandling
     {
-        private readonly IBasicExpenseValidationProvider _basicExpenseValidationProvider;
+        private readonly IExpenseValidatorFactory _expenseValidatorFactory;
         private readonly IDataService _dataService;
         private readonly INotificationService _notificationService;
         private readonly ILogger<AdvancedExpenseReportHandling> _logger;
 
-        public AdvancedExpenseReportHandling(IBasicExpenseValidationProvider basicExpenseValidationProvider, IDataService dataService, INotificationService notificationService, ILogger<AdvancedExpenseReportHandling> logger)
+        public AdvancedExpenseReportHandling(IExpenseValidatorFactory expenseValidatorFactory, IDataService dataService, INotificationService notificationService, ILogger<AdvancedExpenseReportHandling> logger)
         {
-            _basicExpenseValidationProvider = basicExpenseValidationProvider;
+            _expenseValidatorFactory = expenseValidatorFactory;
             _dataService = dataService;
             _notificationService = notificationService;
             _logger = logger;
@@ -86,9 +85,9 @@ namespace DurableFunctionsDemo
         [FunctionName(nameof(AdvancedHandlingValidateReportLineItem))]
         public async Task<CheckApprovalResult> AdvancedHandlingValidateReportLineItem([ActivityTrigger] CheckApprovalRequest checkApprovalRequest)
         {
-            var validationService = _basicExpenseValidationProvider.GetExpenseValidationService(checkApprovalRequest.ExpenseCategory);
+            var validator = _expenseValidatorFactory.Create(checkApprovalRequest.ExpenseCategory);
 
-            var approved = await validationService.IsApproved(checkApprovalRequest.EmployeeId, checkApprovalRequest.Amount);
+            var approved = await validator.IsApproved(checkApprovalRequest.EmployeeId, checkApprovalRequest.Amount);
 
             return new CheckApprovalResult { LineItemId = checkApprovalRequest.LineItemId, IsApproved = approved };
         }

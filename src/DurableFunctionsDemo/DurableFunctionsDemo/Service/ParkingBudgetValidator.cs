@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace DurableFunctionsDemo.Service.Basic
+namespace DurableFunctionsDemo.Service
 {
-    public class BasicParkingBudgetValidationService : IBasicExpenseValidationService
+    public class ParkingBudgetValidator : IExpenseValidator
     {
         public Task<bool> IsApproved(int employeeId, decimal amount) => Task.FromResult(true);
     }

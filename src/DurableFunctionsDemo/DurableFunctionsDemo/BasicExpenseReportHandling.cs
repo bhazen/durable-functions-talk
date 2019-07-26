@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DurableFunctionsDemo.Models;
-using DurableFunctionsDemo.Service.Basic;
+using DurableFunctionsDemo.Service;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -11,12 +11,12 @@ namespace DurableFunctionsDemo
 {
     public class BasicExpenseReportHandling
     {
-        private IBasicExpenseValidationProvider _basicExpenseValidationProvider;
-        private ILogger<BasicExpenseReportHandling> _logger;
+        private readonly IExpenseValidatorFactory _expenseValidatorFactory;
+        private readonly ILogger<BasicExpenseReportHandling> _logger;
 
-        public BasicExpenseReportHandling(IBasicExpenseValidationProvider basicExpenseValidationProvider, ILogger<BasicExpenseReportHandling> logger)
+        public BasicExpenseReportHandling(IExpenseValidatorFactory expenseValidatorFactory, ILogger<BasicExpenseReportHandling> logger)
         {
-            _basicExpenseValidationProvider = basicExpenseValidationProvider;
+            _expenseValidatorFactory = expenseValidatorFactory;
             _logger = logger;
         }
 
@@ -39,9 +39,9 @@ namespace DurableFunctionsDemo
         public async Task<bool> ValidateReportLineItem([ActivityTrigger] DurableActivityContext context)
         {
             var (id, amount, category) = context.GetInput<(int, decimal, ExpenseCategory)>();
-            var validationService = _basicExpenseValidationProvider.GetExpenseValidationService(category);
+            var validator = _expenseValidatorFactory.Create(category);
 
-            return await validationService.IsApproved(id, amount);
+            return await validator.IsApproved(id, amount);
         }
 
         [FunctionName(nameof(BasicHandlingStart))]

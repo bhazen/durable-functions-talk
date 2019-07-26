@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace DurableFunctionsDemo.Service.Unreliable
+namespace DurableFunctionsDemo.Service
 {
     public interface INotificationService
     {
