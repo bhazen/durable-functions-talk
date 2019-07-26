@@ -5,6 +5,8 @@ namespace DurableFunctionsDemo.Models
 {
     public class ExpenseReport
     {
+        public int Id { get; set; }
+
         public DateTime DateSubmitted { get; set; }
 
         public int EmployeeId { get; set; }

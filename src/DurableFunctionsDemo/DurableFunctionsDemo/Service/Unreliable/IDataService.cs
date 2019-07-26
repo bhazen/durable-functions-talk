@@ -6,5 +6,6 @@ namespace DurableFunctionsDemo.Service.Unreliable
     public interface IDataService
     {
         Task SaveReport(ExpenseReport expenseReport);
+        Task SaveReportReliable(ExpenseReport expenseReport);
     }
 }
