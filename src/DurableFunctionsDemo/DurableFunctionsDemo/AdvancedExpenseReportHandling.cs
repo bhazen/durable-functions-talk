@@ -72,6 +72,12 @@ namespace DurableFunctionsDemo
                     {
                         await context.CallActivityAsync(nameof(SendReportReceivedResponseNotification), (report.Id, approvedTask.Result));
                     }
+
+                    if (!timeoutTask.IsCompleted)
+                    {
+                        // the function wont exit unless this is complete or cancelled
+                        timeoutCts.Cancel();
+                    }
                 }
             }
             catch (Exception ex)
