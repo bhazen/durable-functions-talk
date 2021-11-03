@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DurableFunctionsDemo.Models;
 using DurableFunctionsDemo.Service;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
@@ -22,7 +23,7 @@ namespace DurableFunctionsDemo
 
         [FunctionName(nameof(BasicHandlingOrchestrator))]
         public async Task BasicHandlingOrchestrator(
-            [OrchestrationTrigger] DurableOrchestrationContext context)
+            [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var report = context.GetInput<ExpenseReport>();
 
@@ -36,7 +37,7 @@ namespace DurableFunctionsDemo
         }
 
         [FunctionName(nameof(ValidateReportLineItem))]
-        public async Task<bool> ValidateReportLineItem([ActivityTrigger] DurableActivityContext context)
+        public async Task<bool> ValidateReportLineItem([ActivityTrigger] IDurableActivityContext context)
         {
             var (id, amount, category) = context.GetInput<(int, decimal, ExpenseCategory)>();
             var validator = _expenseValidatorFactory.Create(category);
@@ -46,8 +47,8 @@ namespace DurableFunctionsDemo
 
         [FunctionName(nameof(BasicHandlingStart))]
         public async Task<HttpResponseMessage> BasicHandlingStart(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]HttpRequestMessage req,
-            [OrchestrationClient]DurableOrchestrationClient starter)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestMessage req,
+            [DurableClient] IDurableOrchestrationClient starter)
         {
             var expenseReport = await req.Content.ReadAsAsync<ExpenseReport>();
 

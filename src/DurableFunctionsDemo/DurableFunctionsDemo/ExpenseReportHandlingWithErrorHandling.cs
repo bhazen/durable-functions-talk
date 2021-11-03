@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DurableFunctionsDemo.Models;
 using DurableFunctionsDemo.Service;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +29,7 @@ namespace DurableFunctionsDemo
 
         [FunctionName(nameof(BetterExpenseReportHandling))]
         public async Task BetterHandlingOrchestrator(
-            [OrchestrationTrigger] DurableOrchestrationContext context)
+            [OrchestrationTrigger] IDurableOrchestrationContext context)
         {
             var report = context.GetInput<ExpenseReport>();
 
@@ -89,7 +90,7 @@ namespace DurableFunctionsDemo
         [FunctionName(nameof(BetterHandlingStart))]
         public async Task<HttpResponseMessage> BetterHandlingStart(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")]HttpRequestMessage req,
-            [OrchestrationClient]DurableOrchestrationClient starter,
+            [DurableClient]IDurableOrchestrationClient starter,
             ILogger log)
         {
             var expenseReport = await req.Content.ReadAsAsync<ExpenseReport>();
